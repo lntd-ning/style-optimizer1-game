@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Optimizer - Độ Ngầu & Kiếm Tiền</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="overlay">
+        <div class="intro-card">
+            <h1>Fashion Optimizer</h1>
+            <p>Xây dựng đế chế thời trang, tối ưu độ ngầu và kiếm tiền tỷ!</p>
+            <div class="intro-buttons" style="flex-direction: column; gap: 1rem;">
+                <input type="text" id="player-name-input" placeholder="Nhập tên của bạn..." maxlength="15"
+                    class="name-input">
+                <div style="display: flex; gap: 1rem;">
+                    <button onclick="startGame()" class="primary-btn" style="margin-bottom:0">Bắt đầu chơi</button>
+                    <button onclick="openModal('rules-modal')" class="secondary-btn">Luật chơi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <header>
+            <nav class="top-nav">
+                <button onclick="shareGame()" class="nav-link share-btn">Chia sẻ</button>
+                <button onclick="openModal('rules-modal')" class="nav-link">Luật chơi</button>
+                <button onclick="openModal('leaderboard-modal')" class="nav-link">Bảng xếp hạng</button>
+                <button onclick="resetGame()" class="nav-link reset-link">Chơi lại từ đầu</button>
+            </nav>
+            <div class="theme-switcher">
+                <button onclick="changeTheme('default')" class="theme-btn default">Default</button>
+                <button onclick="changeTheme('cyberpunk')" class="theme-btn cyberpunk">Cyberpunk</button>
+                <button onclick="changeTheme('royal')" class="theme-btn royal">Royal</button>
+            </div>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="label">Số dư</span>
+                    <span id="balance" class="value">$1,000</span>
+                </div>
+                <div class="stat-item">
+                    <span class="label">Độ Ngầu</span>
+                    <span id="coolness" class="value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="label">Sự kiện</span>
+                    <span id="event-counter" class="value">0/5</span>
+                </div>
+            </div>
+            <h1>Fashion Optimizer</h1>
+        </header>
+
+        <main>
+            <section class="game-board">
+                <div class="status-section">
+                    <h2>Trạng thái</h2>
+                    <div id="character-canvas" class="equipped-list-container">
+                        <ul id="equipped-items-list" class="equipped-list">
+                            <!-- Equipped item names will be listed here -->
+                        </ul>
+                        <p id="no-items-msg" class="placeholder">Chưa mặc gì...</p>
+                        <!-- Recently Bought Flash -->
+                        <div id="recently-bought" class="recently-bought-display">
+                            <span id="recent-item-name"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="event-section">
+                    <div class="mechanics-info">
+                        <div id="upcoming-event" class="info-card upcoming">
+                            <h3>Sự kiện sắp tới</h3>
+                            <p id="event-name-hint">Đang tải...</p>
+                            <div id="coolness-status" class="coolness-status"></div>
+                            <span id="event-rule-hint" class="hint">Chuẩn bị đồ phù hợp!</span>
+                        </div>
+                    </div>
+                    <button id="next-event" class="primary-btn">Sự kiện tiếp theo</button>
+                    <div id="event-log" class="event-log">
+                        <p class="placeholder">Chưa có sự kiện nào xảy ra...</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="interaction-panel">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('shop')">Cửa hàng</button>
+                    <button class="tab-btn" onclick="switchTab('wardrobe')">Tủ đồ của tôi</button>
+                </div>
+
+                <div id="shop-tab" class="tab-content active">
+                    <div id="item-list" class="item-grid">
+                        <!-- Items will appear here -->
+                    </div>
+                </div>
+
+                <div id="wardrobe-tab" class="tab-content">
+                    <p class="subtitle">Mặc đồ từ tủ đồ để tăng Độ Ngầu</p>
+                    <div id="wardrobe-list" class="wardrobe-grid">
+                        <!-- Wardrobe items will be injected here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <!-- Modals -->
+    <div id="rules-modal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content">
+            <span class="close-btn" onclick="toggleModal('rules-modal', false)">&times;</span>
+            <h2>Luật chơi</h2>
+            <div class="rules-list">
+                <div class="rule-item">
+                    <strong>1. Độ Ngầu (Coolness):</strong> Mỗi món đồ bạn mặc sẽ tăng độ ngầu. Bạn cần độ ngầu cao hơn
+                    mức yêu cầu (Alpha) để kiếm tiền.
+                </div>
+                <div class="rule-item">
+                    <strong>2. Hệ số Alpha:</strong> Yêu cầu = (5 × Fame + 10) × Hệ số sự kiện. Nếu fame cao, yêu cầu
+                    càng gắt!
+                </div>
+                <div class="rule-item">
+                    <strong>3. Quy tắc bắt buộc:</strong> Một số sự kiện bắt buộc bạn phải mặc đúng loại đồ (ví dụ: Thảm
+                    đỏ cần JEWELRY). Không mặc sẽ bị <strong>phạt 10% tiền</strong>.
+                </div>
+                <div class="rule-item">
+                    <strong>4. Reset đồ:</strong> Sau mỗi sự kiện, bạn sẽ cởi hết đồ để chuẩn bị cho xu hướng mới. Đừng
+                    lo, đồ đã mua sẽ được lưu vào <strong>Tủ đồ</strong>.
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="leaderboard-modal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content">
+            <span class="close-btn" onclick="toggleModal('leaderboard-modal', false)">&times;</span>
+            <h2>Bảng xếp hạng điểm cao</h2>
+            <div id="leaderboard-list" class="leaderboard-list">
+                <div class="leaderboard-header">
+                    <span>Hạng</span>
+                    <span>Người chơi</span>
+                    <span>Số điểm</span>
+                </div>
+                <!-- Top 10 scores will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Victory Screen -->
+    <div id="victory-screen" class="overlay victory" style="display: none;">
+        <div class="intro-card victory-card">
+            <div class="stars big">👑👑👑</div>
+            <h1>CHIẾN THẮNG!</h1>
+            <p>Chúc mừng! Bạn đã đạt cột mốc <strong>$100,000</strong> và trở thành Fashion Tycoon!</p>
+            <div id="final-stats" class="final-stats"></div>
+            <div class="intro-buttons">
+                <button onclick="resetGame(true)" class="primary-btn">Chơi lại</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Defeat Screen -->
+    <div id="defeat-screen" class="overlay defeat" style="display: none;">
+        <div class="intro-card defeat-card">
+            <div class="stars big">💔</div>
+            <h1>GAME OVER</h1>
+            <p>Bạn đã hết ngân sách hoặc hết lượt chơi mà chưa đạt mục tiêu...</p>
+            <div id="defeat-quote" class="quote"></div>
+            <div class="intro-buttons">
+                <button onclick="resetGame(true)" class="primary-btn">Thử lại lần nữa</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+
+</html>
